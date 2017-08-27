@@ -108,7 +108,24 @@
 			<artifactId>h2</artifactId>
 			<version>1.4.196</version>
 		</dependency>
-
+		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>23.0</version>
+		</dependency>
+ 	<dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>22.0</version>
+        </dependency>
+        
+ <!-- mvn install:install-file -Dfile=C:/Users/LENOVO/Downloads/bloom-filter-1.2.2.jar -DgroupId=orestes.bloomfilter  -DartifactId=oretesCBC -Dversion=1.2.2 -Dpackaging=jar -->	
+ 	 <dependency>
+ 		  <groupId>orestes.bloomfilter</groupId>
+ 		  <artifactId>oretesCBC</artifactId>
+ 		  <version>1.2.2</version>
+	</dependency>
 
 	</dependencies>
 	<properties>
@@ -118,10 +135,13 @@
 	</properties>
 
 	<build>
+		 
+
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			
 			</plugin>
 		</plugins>
 	</build>
