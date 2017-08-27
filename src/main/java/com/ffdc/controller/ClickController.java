@@ -1,11 +1,13 @@
 package com.ffdc.controller;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.http.HttpStatus;
@@ -22,16 +24,14 @@ import com.ffdc.BrowserHeadersAndCookie.BrowserEntropy;
 import com.ffdc.BrowserHeadersAndCookie.DerivedClientIP;
 import com.ffdc.BrowserHeadersAndCookie.UniqueHitTrackerCookie;
 import com.ffdc.DataAccesObjects.CampaignDAO;
- 
-import com.ffdc.daemons.BadIPScreenerDaemon;
-import com.ffdc.daemons.GeneratedTokenUpdateWorker;
 import com.ffdc.daemons.AsycHitRecorder;
 import com.ffdc.daemons.AsyncDatabaseTasksExecutor;
+import com.ffdc.daemons.BloomFilterBasedBadRequestScreener;
+import com.ffdc.daemons.GeneratedTokenUpdateWorker;
 import com.ffdc.models.Campaign;
 import com.ffdc.utility.AESEncryptDecrypt;
 import com.ffdc.utility.Constants;
 import com.ffdc.utility.StolenToken;
-import java.util.Map;
 
 /**
  * It has routes to create : 1) Email Click Tracker Token 2) Web click Tracker
@@ -216,8 +216,10 @@ public class ClickController {
 		// various http headers
 		String derivedClientIP = DerivedClientIP.getDerivedClientIPFromRequest(req, false);
 		String clientIP = req.getRemoteAddr();
+		BrowserEntropy browserEntropy = new BrowserEntropy(req);
+		String fingerPrint = browserEntropy.getfingerPrint(clientIP, derivedClientIP);
 		// Checks if IP is bad. Also increament count of current ip
-		if (BadIPScreenerDaemon.isBadIP(clientIP, derivedClientIP)) {
+		if (BloomFilterBasedBadRequestScreener.isBadIP(fingerPrint)) {
 			// Isn't the token stolen and being re-used
 			StolenToken.setStolenToken(token);
 			return new ResponseEntity<String>("Stolen Token", HttpStatus.BAD_REQUEST);
@@ -229,7 +231,7 @@ public class ClickController {
 			// We don't want to process any further
 			// not even obligated to give nice reply to the caller
 
-			BadIPScreenerDaemon.setBadIP(clientIP, derivedClientIP);
+			BloomFilterBasedBadRequestScreener.setBadIP(fingerPrint);
 			return new ResponseEntity<String>("Token cannot be Decrypted.", HttpStatus.BAD_REQUEST);
 		}
 
@@ -243,8 +245,7 @@ public class ClickController {
 
 		String referer = req.getHeader("Referer");
 		//
-		BrowserEntropy browserEntropy = new BrowserEntropy(req);
-		String fingerPrint = browserEntropy.getfingerPrint(clientIP, derivedClientIP);
+		
 
 		// Parse cleartoken to get useful information
 		String[] splittedStrings = cleartexttoken.split(Constants.TokenDelimiter);
@@ -318,8 +319,13 @@ public class ClickController {
 
 		String derivedClientIP = DerivedClientIP.getDerivedClientIPFromRequest(req, false);
 		String clientIP = req.getRemoteAddr();
+	
+		BrowserEntropy browserEntropy = new BrowserEntropy(req);
+		String fingerPrint = browserEntropy.getfingerPrint(clientIP, derivedClientIP);
+
+		
 		// Checks if IP is bad. Also increament count of current ip
-		if (BadIPScreenerDaemon.isBadIP(clientIP, derivedClientIP)) {
+		if (BloomFilterBasedBadRequestScreener.isBadIP(fingerPrint)) {
 			// Isn't the token stolen and being re-used
 			StolenToken.setStolenToken(token);
 			return new ResponseEntity<String>("Stolen Token", HttpStatus.BAD_REQUEST);
@@ -331,7 +337,7 @@ public class ClickController {
 			// We don't want to process any further
 			// not even obligated to give nice reply to the caller
 
-			BadIPScreenerDaemon.setBadIP(clientIP, derivedClientIP);
+			BloomFilterBasedBadRequestScreener.setBadIP(fingerPrint);
 			return null;
 		}
 
@@ -346,9 +352,7 @@ public class ClickController {
 			deviceType = Constants.DeviceTypePC;
 		String referer = req.getHeader("Referer");
 
-		BrowserEntropy browserEntropy = new BrowserEntropy(req);
-		String fingerPrint = browserEntropy.getfingerPrint(clientIP, derivedClientIP);
-
+	
 		// Parse cleartoken to get useful information
 		String[] splittedStrings = cleartexttoken.split(Constants.TokenDelimiter);
 		if (splittedStrings.length == 3) {

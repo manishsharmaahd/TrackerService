@@ -2,6 +2,9 @@ package com.ffdc.daemons;
 
 import java.util.HashMap;
 import java.util.List;
+import com.google.common.hash.BloomFilter;
+import com.google.common.hash.Funnels;
+
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -29,49 +32,67 @@ public class BadIPScreenerDaemon implements Runnable {
 	private static final Log log = LogFactory.getLog(BadIPScreenerDaemon.class);
 	public static HashMap<String, BadIP> badIps = new HashMap<>();
 	boolean stopped = false;
-
+	
+	//Bloom filter to give existance of match with 99% probability
+	//1000*1000*1000 is expected number of fileters, 0.99 is probability
+	// This bloom filter will store 1 billion items each of 9.6 bit. Total memory usage would be 1.2 GB
+	static BloomFilter<CharSequence> bloomFilter99percent = BloomFilter.create(Funnels.unencodedCharsFunnel(), 1000*1000*1000L,0.99); 
+			 
+	
+	
 	/**
 	 * The set access count of IP greater than MAX_SAFE_COUNT so that is marked
 	 * permanently bad
 	 * 
-	 * @param clientIP
-	 * @param clientDerivedIP
+	 * @param browserEntproy =  ip addresses and header
+	 
 	 */
-	public static void setBadIP(String clientIP, String clientDerivedIP) {
-		BadIP ip = badIps.get(clientIP + clientDerivedIP);
+	public static void setBadIPA(String browserFingerPrint) {
+		BadIP ip = badIps.get(browserFingerPrint);
 
 		if (ip == null) {
 			ip = new BadIP();
-			ip.setDerivedClinetIP(clientDerivedIP);
-			ip.setClientIP(clientDerivedIP);
+		 
+			ip.setBrowserFingerPrint(browserFingerPrint);
 			ip.setLastAccessTimestamp(System.currentTimeMillis());
 			ip.setBeginWindowTimestamp(System.currentTimeMillis());
 			ip.setCount(Constants.MAX_SAFE_COUNT + 1);
-			badIps.put(clientIP + clientDerivedIP, ip);
+			badIps.put(browserFingerPrint, ip);
 
 		} else {
 
 			ip.setCount(Constants.MAX_SAFE_COUNT + 1);
 		}
 	}
-
-	public static boolean isBadIP(String clientIP, String clientDerivedIP) {
-		BadIP ip = badIps.get(clientIP + clientDerivedIP);
+	
+	 
+	public static boolean isBadIPA(String fingerPrint) {
+		
+		if ( bloomFilter99percent.mightContain(fingerPrint) )
+			//Here we are penalizing 1% of geunuine client for performance region.
+			return false;
+		
+		//we cannot avoid has here because we need to update hitcount
+		
+		BadIP ip = badIps.get(fingerPrint);
 		if (ip == null) {
 			ip = new BadIP();
-			ip.setDerivedClinetIP(clientDerivedIP);
-			ip.setClientIP(clientDerivedIP);
+		 
+			ip.setBrowserFingerPrint(fingerPrint) ;
 			ip.setLastAccessTimestamp(System.currentTimeMillis());
 			ip.setBeginWindowTimestamp(System.currentTimeMillis());
 			ip.setCount(0);
-			badIps.put(clientIP + clientDerivedIP, ip);
+			badIps.put(fingerPrint, ip);
 			return false;
 		} else {
 			if (ip.getCount() > Constants.MAX_SAFE_COUNT)
+			{
 				// once bad always bad
+				bloomFilter99percent.put(fingerPrint);
+				badIps.remove(fingerPrint); //no need to maintain in hash
 				return true;
+			}
 			ip.setCount(ip.getCount() + 1);
-
 			ip.setLastAccessTimestamp(System.currentTimeMillis());
 			if ((ip.getLastAccessTimestamp() - ip.getBeginWindowTimestamp()) > Constants.SAFE_COUNT_TIME_INTERVAL) {
 				ip.setLastAccessTimestamp(System.currentTimeMillis());
@@ -89,7 +110,7 @@ public class BadIPScreenerDaemon implements Runnable {
 			EntityManagerWrapper.getEntityManager().getTransaction().begin();
 			BadIDDAO dao = new BadIDDAO();
 			List<BadIP> ips = dao.findAll();
-			ips.forEach(badip -> badIps.put(badip.getDerivedClinetIP() + badip.getClientIP(), badip));
+			ips.forEach(badip -> badIps.put( badip.getBrowserFingerPrint(), badip));
 			if (EntityManagerWrapper.isEntityManagerOpeninCurrentThread()
 					&& EntityManagerWrapper.getEntityManager().getTransaction().isActive())
 				EntityManagerWrapper.getEntityManager().getTransaction().commit();
@@ -116,7 +137,7 @@ public class BadIPScreenerDaemon implements Runnable {
 
 			EntityManagerWrapper.getEntityManager().getTransaction().begin();
 			List<BadIP> ips = dao.findAll();
-			ips.forEach(badip -> badIpsTemp.put(badip.getDerivedClinetIP() + badip.getClientIP(), badip));
+			ips.forEach(badip -> badIpsTemp.put(badip.getBrowserFingerPrint(), badip));
 
 			Set<String> kset = badIps.keySet();
 			kset.forEach(keyip -> {
@@ -162,7 +183,7 @@ public class BadIPScreenerDaemon implements Runnable {
 	@Override
 	public void run() {
 		try {
-			BadIPScreenerDaemon.init();
+			init();
 
 			while (!stopped) {
 				try {

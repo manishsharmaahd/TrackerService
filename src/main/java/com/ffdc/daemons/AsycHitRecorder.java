@@ -135,7 +135,7 @@ public class AsycHitRecorder implements Runnable {
 			if (tokentimestamp != 0 && (System.currentTimeMillis() - tokentimestamp) > 3600 * 1000) {
 				// why would someone use old token.
 				StolenToken.setStolenToken(token);
-				BadIPScreenerDaemon.setBadIP(clientIP, derivedClientIP);
+				BloomFilterBasedBadRequestScreener.setBadIP(fingerPrint);
 				// not obligated to return anything
 				return;
 			}

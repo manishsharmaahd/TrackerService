@@ -61,8 +61,7 @@ public class BadIDDAO {
 
 			String querystring = "update BadIP  set count = " + instance.getCount() + ", beginWindowTimestamp = "
 					+ instance.getBeginWindowTimestamp() + ",lastAccessTimestamp = " + instance.getLastAccessTimestamp()
-					+ " where DerivedClinetIP = '" + instance.getDerivedClinetIP() + "' and ClientIP = '"
-					+ instance.getClientIP() + "'";
+					+ " where BrowserFingerPrint = '" + instance.getBrowserFingerPrint() + "'";
 
 			Query query = entityManager.createNativeQuery(querystring);
 			cl = query.executeUpdate();

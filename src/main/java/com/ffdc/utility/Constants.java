@@ -16,10 +16,10 @@ public class Constants {
 	
 	// configuration for BadIPScreener
 	public static long SAFE_COUNT_TIME_INTERVAL = 300 * 1000; // 5 minutes
-	public static int MAX_SAFE_COUNT = 500;
+	public static int MAX_SAFE_COUNT = 3;
 	
 	// Status of Hitlog record
-	public static int HIT_RECORD_PROCESSING = 3;
+	public static int HIT_RECORD_PROCESSING = 5;
 	public static int HIT_RECORD_UNPROCESSED = 0 ;
 	public static int HIT_RECORD_PROCESSED = 2 ;
     

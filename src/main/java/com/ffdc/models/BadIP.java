@@ -22,8 +22,8 @@ public class BadIP implements java.io.Serializable {
 	private static final long serialVersionUID = 6931829019287525970L;
 
 	private int id;
-	private String devrivedClinetIP;
-	private String clientIP;
+	 
+	private String browserFingerPrint;
 	private long beginWindowTimestamp;
 	private long lastAccessTimestamp;
 
@@ -44,22 +44,16 @@ public class BadIP implements java.io.Serializable {
 		this.id = id;
 	}
 
-	@Column(name = "DerivedClinetIP", length = 45)
-	public String getDerivedClinetIP() {
-		return devrivedClinetIP;
+ 
+	 
+
+	@Column(name = "BrowserFingerPrint", length = 1024)
+	public String getBrowserFingerPrint() {
+		return browserFingerPrint;
 	}
 
-	public void setDerivedClinetIP(String devrivedClinetIP) {
-		this.devrivedClinetIP = devrivedClinetIP;
-	}
-
-	@Column(name = "ClientIP", length = 8)
-	public String getClientIP() {
-		return clientIP;
-	}
-
-	public void setClientIP(String remoteIP) {
-		this.clientIP = remoteIP;
+	public void setBrowserFingerPrint(String browserFingerPrint) {
+		this.browserFingerPrint = browserFingerPrint;
 	}
 
 	@Column(name = "beginWindowTimestamp", length = 8)
@@ -94,9 +88,9 @@ public class BadIP implements java.io.Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (int) (beginWindowTimestamp ^ (beginWindowTimestamp >>> 32));
-		result = prime * result + ((clientIP == null) ? 0 : clientIP.hashCode());
+		result = prime * result + ((browserFingerPrint == null) ? 0 : browserFingerPrint.hashCode());
 		result = prime * result + count;
-		result = prime * result + ((devrivedClinetIP == null) ? 0 : devrivedClinetIP.hashCode());
+		result = prime * result + id;
 		result = prime * result + (int) (lastAccessTimestamp ^ (lastAccessTimestamp >>> 32));
 		return result;
 	}
@@ -112,21 +106,22 @@ public class BadIP implements java.io.Serializable {
 		BadIP other = (BadIP) obj;
 		if (beginWindowTimestamp != other.beginWindowTimestamp)
 			return false;
-		if (clientIP == null) {
-			if (other.clientIP != null)
+		if (browserFingerPrint == null) {
+			if (other.browserFingerPrint != null)
 				return false;
-		} else if (!clientIP.equals(other.clientIP))
+		} else if (!browserFingerPrint.equals(other.browserFingerPrint))
 			return false;
 		if (count != other.count)
 			return false;
-		if (devrivedClinetIP == null) {
-			if (other.devrivedClinetIP != null)
-				return false;
-		} else if (!devrivedClinetIP.equals(other.devrivedClinetIP))
+		if (id != other.id)
 			return false;
 		if (lastAccessTimestamp != other.lastAccessTimestamp)
 			return false;
 		return true;
 	}
+
+	 
+
+	 
 
 }

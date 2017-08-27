@@ -23,7 +23,7 @@ import com.ffdc.BrowserHeadersAndCookie.BrowserEntropy;
 import com.ffdc.BrowserHeadersAndCookie.DerivedClientIP;
 import com.ffdc.BrowserHeadersAndCookie.UniqueHitTrackerCookie;
 import com.ffdc.DataAccesObjects.CampaignDAO;
-import com.ffdc.daemons.BadIPScreenerDaemon;
+import com.ffdc.daemons.BloomFilterBasedBadRequestScreener;
 import com.ffdc.daemons.GeneratedTokenUpdateWorker;
 import com.ffdc.daemons.AsycHitRecorder;
 import com.ffdc.daemons.AsyncDatabaseTasksExecutor;
@@ -204,8 +204,12 @@ public class OpenController {
 		// various http headers
 		String derivedClientIP = DerivedClientIP.getDerivedClientIPFromRequest(req, false);
 		String clientIP = req.getRemoteAddr();
+
+		BrowserEntropy browserEntropy = new BrowserEntropy(req);
+		String fingerPrint = browserEntropy.getfingerPrint(clientIP, derivedClientIP);
+
 		// Checks if IP is bad. Also increament count of current ip
-		if (BadIPScreenerDaemon.isBadIP(clientIP, derivedClientIP)) {
+		if (BloomFilterBasedBadRequestScreener.isBadIP(fingerPrint)) {
 			// Isn't the token stolen and being re-used
 			StolenToken.setStolenToken(token);
 			return null;
@@ -217,7 +221,7 @@ public class OpenController {
 			// We don't want to process any further
 			// not even obligated to give nice reply to the caller
 
-			BadIPScreenerDaemon.setBadIP(clientIP, derivedClientIP);
+			BloomFilterBasedBadRequestScreener.setBadIP(fingerPrint);
 			return null;
 		}
 
@@ -231,8 +235,6 @@ public class OpenController {
 
 		String referer = req.getHeader("Referer");
 
-		BrowserEntropy browserEntropy = new BrowserEntropy(req);
-		String fingerPrint = browserEntropy.getfingerPrint(clientIP, derivedClientIP);
 
 		// if cleartext token is corrupted. It is our mistake. We cannot
 		// penalize the caller for that
@@ -301,8 +303,12 @@ public class OpenController {
 
 		String derivedClientIP = DerivedClientIP.getDerivedClientIPFromRequest(req, false);
 		String clientIP = req.getRemoteAddr();
+		BrowserEntropy browserEntropy = new BrowserEntropy(req);
+		String fingerPrint = browserEntropy.getfingerPrint(clientIP, derivedClientIP);
+
+		
 		// Checks if IP is bad. Also increament count of current ip
-		if (BadIPScreenerDaemon.isBadIP(clientIP, derivedClientIP)) {
+		if (BloomFilterBasedBadRequestScreener.isBadIP(fingerPrint)) {
 			// Isn't the token stolen and being re-used
 			StolenToken.setStolenToken(token);
 			return null;
@@ -314,7 +320,7 @@ public class OpenController {
 			// We don't want to process any further
 			// not even obligated to give nice reply to the caller
 
-			BadIPScreenerDaemon.setBadIP(clientIP, derivedClientIP);
+			BloomFilterBasedBadRequestScreener.setBadIP(fingerPrint);
 			return null;
 		}
 
@@ -330,8 +336,6 @@ public class OpenController {
 
 		String referer = req.getHeader("Referer");
 
-		BrowserEntropy browserEntropy = new BrowserEntropy(req);
-		String fingerPrint = browserEntropy.getfingerPrint(clientIP, derivedClientIP);
 
 		// Parse cleartoken to get useful information
 		String[] splittedStrings = cleartexttoken.split(Constants.TokenDelimiter);

@@ -1,7 +1,9 @@
 package com.ffdc.utility;
 
  
-import java.util.HashSet;
+
+import com.google.common.hash.BloomFilter;
+import com.google.common.hash.Funnels;
 /**
  * The hacker will only steel few tokens and use them for attack.
  * Here we store the tokens that are stolen
@@ -12,15 +14,16 @@ import java.util.HashSet;
  *
  */
 public class StolenToken {
- private static HashSet<String> stolenToken = new HashSet<>();
  
+	static BloomFilter<CharSequence> bloomFilter99percent = BloomFilter.create(Funnels.unencodedCharsFunnel(), 1000*1000,0.99); 
+
  public static void setStolenToken(String token) {
-	 stolenToken.add(token);
+	 bloomFilter99percent.put(token);
  }
  
  public static boolean isStolen(String token)
  {
-	 return stolenToken.contains(token);
+	 return bloomFilter99percent.mightContain(token);
 	 
  }
 }

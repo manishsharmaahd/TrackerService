@@ -100,7 +100,7 @@ public class HitLog implements java.io.Serializable {
 		this.derivedClinetIP = devrivedClinetIP;
 	}
 
-	@Column(name = "ClientIP", length = 8)
+	@Column(name = "ClientIP", length = 45)
 	public String getClientIP() {
 		return clientIP;
 	}
