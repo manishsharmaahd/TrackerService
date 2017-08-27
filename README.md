@@ -4,11 +4,14 @@
 
 <p class=MsoNormal><b style='mso-bidi-font-weight:normal'>Quick Start: <o:p></o:p></b></p>
 
+
+
 <p class=MsoListParagraphCxSpFirst style='text-indent:-18.0pt;mso-list:l12 level1 lfo1'><![if !supportLists]><b
 style='mso-bidi-font-weight:normal'><span style='mso-bidi-font-family:Calibri;
 mso-bidi-theme-font:minor-latin'><span style='mso-list:Ignore'>1)<span
 style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span></span></b><![endif]><b
 style='mso-bidi-font-weight:normal'>Start Boots App<o:p></o:p></b></p>
+
 
 <p class=MsoListParagraphCxSpMiddle style='margin-left:72.0pt;mso-add-space:
 auto;text-indent:-18.0pt;mso-list:l12 level2 lfo1'><![if !supportLists]><span
@@ -21,7 +24,12 @@ auto;text-indent:-18.0pt;mso-list:l12 level2 lfo1'><![if !supportLists]><span
 style='mso-bidi-font-family:Calibri;mso-bidi-theme-font:minor-latin'><span
 style='mso-list:Ignore'>b.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span></span><![endif]>Download java 8</p>
+Since bloom-filter-1.2.2.jar is not hosted in centeral maven repository, following is required:
+Download bloom-filter-1.2.2.jar from following link: 
+https://drive.google.com/open?id=0ByVSDhao_vGxSFFGeGlVcmUxQzA
 
+Use following install that in repository ()
+mvn install:install-file -Dfile=<Downloaddirectory>/bloom-filter-1.2.2.jar -DgroupId=orestes.bloomfilter  -DartifactId=oretesCBC -Dversion=1 -Dpackaging=jar
 <p class=MsoListParagraphCxSpMiddle style='margin-left:72.0pt;mso-add-space:
 auto;text-indent:-18.0pt;mso-list:l12 level2 lfo1'><![if !supportLists]><span
 style='mso-bidi-font-family:Calibri;mso-bidi-theme-font:minor-latin'><span
