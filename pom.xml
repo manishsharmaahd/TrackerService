@@ -23,7 +23,7 @@
     <repositories>
         <repository>
             <id>Orestes-Bloomfilter</id>
-            <url>https://dl.bintray.com/baqend/maven</url>
+            <url>https://dl.bintray.com/baqend</url>
 
         </repository>
 
@@ -121,13 +121,17 @@
 			<artifactId>guava</artifactId>
 			<version>23.0</version>
 		</dependency>
-<dependency>
-  <groupId>com.baqend</groupId>
-  <artifactId>bloom-filter</artifactId>
-  <version>1.2.3</version>
-  <type>pom</type>
-</dependency>
  <!-- mvn install:install-file -Dfile=C:/Users/LENOVO/Downloads/bloom-filter-1.2.2.jar -DgroupId=orestes.bloomfilter  -DartifactId=oretesCBC -Dversion=1.2.2 -Dpackaging=jar -->	
+
+<!-- https://mvnrepository.com/artifact/com.github.xuanyue202/bloom-filter -->
+<dependency>
+    <groupId>com.github.xuanyue202</groupId>
+    <artifactId>bloom-filter</artifactId>
+    <version>1.2.1</version>
+</dependency>
+
+
+
     </dependencies>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
