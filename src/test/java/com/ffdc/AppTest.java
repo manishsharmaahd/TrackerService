@@ -30,7 +30,7 @@ import junit.framework.TestSuite;
 
 
 		System.out.println("AppTest Success");
-		String s = "Hello World";
+		String s = "1Hello World";
 		assertEquals( s,"Hello World");
 		System.out.println("AppTest Success");
 
