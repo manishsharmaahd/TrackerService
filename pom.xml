@@ -20,16 +20,8 @@
 
 
 
-    <repositories>
-        <repository>
-            <id>Orestes-Bloomfilter</id>
-            <url>https://dl.bintray.com/baqend</url>
-
-        </repository>
-
-    </repositories>
 	<dependencies>
-		<!-- https://mvnrepository.com/artifact/org.webjars/ng-table -->
+
 
 
 		<dependency>
@@ -141,6 +133,7 @@
 
 	<build>
 		 
+
 
 		<plugins>
 			<plugin>
